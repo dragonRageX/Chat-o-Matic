@@ -15,11 +15,22 @@ const schema = createSchema({
         type Query {
             messages: [Message!]
         }
-    `,  //The '!' mark suggests that the field is required. The Query object stores all the Message objects inside an array.
+
+        type Mutation {
+            postMessage(user: String!, content: String!): ID!
+        }
+    `,  //The '!' mark suggests that the field is required. The Query type stores all the Message objects inside an array. The Query type is like a GET request in the REST framework. The Mutation type is like a POST request in the REST framework.
     
     resolvers: {   //resolvers are the implementation of the typeDefs, like a Model of the Schema
         Query: {
             messages: () => messages,
+        },
+        Mutation: {
+            postMessage: (parent, { user, content }) => {
+                const id = messages.length;
+                messages.push({ id: id, user: user, content: content });
+                return id;
+            }
         }
     }
 });
@@ -31,11 +42,11 @@ const server = createServer(yoga);
 server.listen(4000, () => {
     console.info("Server started on http://localhost:4000/graphql"); 
 });   // http://localhost:4000/graphql - This link opens up a GraphiQL GUI.
-    //A sample GraphiQL query - 
+    //A sample GraphiQL Query type - 
     // query {
     //     messages {
     //       id
     //       content
     //       user
     //     } 
-    //   }
+    // }
