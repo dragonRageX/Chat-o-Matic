@@ -5,7 +5,7 @@
     "build": "webpack --mode production",
     "build:dev": "webpack --mode development",
     "build:start": "cd dist && PORT=8080 npx serve",
-    "start": "set NODE_OPTIONS=--openssl-legacy-provider && webpack serve --open --mode development",
+    "start": "set NODE_OPTIONS=--openssl-legacy-provider",
     "start:live": "webpack serve --open --mode development --liveReload",
     "docker:build": "docker build . -t wp5-starter",
     "docker:run": "docker run -p 8080:8080 wp5-starter"
