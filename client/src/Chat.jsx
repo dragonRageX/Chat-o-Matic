@@ -1,5 +1,8 @@
 import React from "react";
 import { ApolloClient, InMemoryCache, ApolloProvider, useQuery, gql } from '@apollo/client';
+import { InputText } from 'primereact/inputtext';
+import { Button } from 'primereact/button';
+import { Message } from 'primereact/message';
 
 const client = new ApolloClient({
     uri: 'http://localhost:4000/graphql',
@@ -35,8 +38,13 @@ function Messages({ user })
                 {
                     data.messages.map(({ id, user: messageUser, content }) => {
                         return (
-                            <div key={id} style={{ display: "flex", justifyContent: user === messageUser ? "flex-end" : "flex-start", paddingBottom: "1em" }}>
-                                <div style={{ background: user === messageUser ? "#58bf56" : "#e5e6ea", color: user === messageUser ? "white" : "black", padding: "1em", borderRadius: "1em", maxWidth: "60%" }}>
+                            <div key={id} style={{ display: "flex", justifyContent: messageUser === user ? "flex-end" : "flex-start", paddingBottom: "1em", alignItems: "center" }}>
+                                { messageUser !== user && (
+                                    <div style={{ height: "40px", width: "40px", marginRight: "0.5em", border: "2px solid #e5e6ea", borderRadius: "50%", fontSize: "18pt", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                        { messageUser.slice(0, 2).toUpperCase() }
+                                    </div>
+                                ) }
+                                <div style={{ background: messageUser === user ? "#58bf56" : "#e5e6ea", color: user === messageUser ? "white" : "black", padding: "1em", borderRadius: "1em", maxWidth: "60%", textAlign: "center" }}>
                                     {content}
                                 </div>
                             </div>
@@ -50,9 +58,43 @@ function Messages({ user })
 
 function Chat()
 {
+    let [state, setState] = React.useState({
+        user: "Jack",
+        content: ""
+    });
+
+    function sendMessage(e)
+    {
+        if(state.content.length > 0)
+        {
+            setState((prevState) => (   //set the message content field to blank
+                {
+                    ...prevState,
+                    content: ""
+                }
+            ));
+        }
+        else
+        {
+
+        }
+    }
+
     return (
         <div className="messages-container">
-            <Messages user="Jack" />
+            <Messages user={state.user} />
+            <div className="grid-container">
+                <div className="column">
+                    <InputText label="User" value={state.user} onChange={(e) => setState((prevState) => ({ ...prevState, user: e.target.value }))} type="text" className="p-inputtext-lg" placeholder="Enter Username" style={{ width: "100%", height: "40px", borderRadius: "5px", border: "1px solid lightblue", textIndent: "5px" }} />
+                </div>
+                <div className="column">
+                    <InputText label="Content" value={state.content} onChange={(e) => setState((prevState) => ({ ...prevState, content: e.target.value }))} onKeyUp={(e) => { if(e.key === "Enter" || e.key === "Return"){ sendMessage(e); } }} type="text" className="p-inputtext-lg" placeholder="Enter Message" style={{ width: "100%", height: "40px", borderRadius: "5px", border: "1px solid lightblue", textIndent: "5px" }} />
+                    {state.content.length === 0 && <Message text="Message Content is required" style={{ color: "red", background: "rgba(255, 231, 230, 0.7)", padding: "8px", marginTop: "10px" }} />}
+                </div>
+                <div className="column">
+                    {state.content.length != 0 && <Button label="Send" onClick={(e) => sendMessage(e)} style={{ width: "100%", height: "40px", borderRadius: "5px", background: "blue", color: "white", border: "none" }} />}
+                </div>
+            </div>
         </div>
     );
 }
