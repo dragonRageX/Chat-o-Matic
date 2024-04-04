@@ -1,5 +1,5 @@
 import React from "react";
-import { ApolloClient, InMemoryCache, ApolloProvider, useQuery, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, useQuery, useMutation, gql } from '@apollo/client';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Message } from 'primereact/message';
@@ -16,6 +16,12 @@ query {
       content
       user
     } 
+  }
+`;
+
+const POST_MESSAGE = gql`
+mutation ($user: String!, $content: String!) {
+    postMessage(user: $user, content: $content)
   }
 `;
 
@@ -63,20 +69,31 @@ function Chat()
         content: ""
     });
 
+    const [postMessage, { loading, error, data }] = useMutation(POST_MESSAGE);   //the 'data' property contains the 'ID' that is being returned by our postMessage mutation
+    
     function sendMessage(e)
     {
         if(state.content.length > 0)
         {
+            postMessage({ variables: { user: state.user, content: state.content } });   //fire the mutation function
+
+            if(loading)
+            {
+                return <p>Loading...</p>;
+            }
+            if(error)
+            {
+                return <pre>Error: {error.message}</pre>;
+            }
+
+            console.log(data);
+
             setState((prevState) => (   //set the message content field to blank
                 {
                     ...prevState,
                     content: ""
                 }
             ));
-        }
-        else
-        {
-
         }
     }
 
