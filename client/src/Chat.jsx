@@ -50,7 +50,7 @@ function Messages({ user })
                                         { messageUser.slice(0, 2).toUpperCase() }
                                     </div>
                                 ) }
-                                <div style={{ background: messageUser === user ? "#58bf56" : "#e5e6ea", color: user === messageUser ? "white" : "black", padding: "1em", borderRadius: "1em", maxWidth: "60%", textAlign: "center" }}>
+                                <div style={{ background: messageUser === user ? "#58bf56" : "#e5e6ea", color: user === messageUser ? "white" : "black", padding: "1em", borderRadius: "1em", maxWidth: "60%" }}>
                                     {content}
                                 </div>
                             </div>
@@ -71,19 +71,23 @@ function Chat()
 
     const [postMessage, { loading, error, data }] = useMutation(POST_MESSAGE);   //the 'data' property contains the 'ID' that is being returned by our postMessage mutation
     
+    let messageState;
     function sendMessage(e)
     {
         if(state.content.length > 0)
         {
-            postMessage({ variables: { user: state.user, content: state.content } });   //fire the mutation function
+            postMessage({   //fire the mutation function
+                variables: { user: state.user, content: state.content }, 
+                refetchQueries: [ GET_MESSAGES ] 
+            });
 
             if(loading)
             {
-                return <p>Loading...</p>;
+                messageState =  <p>Loading...</p>;
             }
             if(error)
             {
-                return <pre>Error: {error.message}</pre>;
+                messageState = <pre>Error: {error.message}</pre>;
             }
 
             console.log(data);
@@ -110,6 +114,7 @@ function Chat()
                 </div>
                 <div className="column">
                     {state.content.length != 0 && <Button label="Send" onClick={(e) => sendMessage(e)} style={{ width: "100%", height: "40px", borderRadius: "5px", background: "blue", color: "white", border: "none" }} />}
+                    {messageState}
                 </div>
             </div>
         </div>
